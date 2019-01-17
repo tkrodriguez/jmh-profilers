@@ -1,5 +1,14 @@
 package profilers;
 
+import org.openjdk.jmh.infra.BenchmarkParams;
+import org.openjdk.jmh.profile.ExternalProfiler;
+import org.openjdk.jmh.results.AggregationPolicy;
+import org.openjdk.jmh.results.Aggregator;
+import org.openjdk.jmh.results.BenchmarkResult;
+import org.openjdk.jmh.results.Result;
+import org.openjdk.jmh.results.ResultRole;
+import org.openjdk.jmh.util.FileUtils;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -10,15 +19,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-
-import org.openjdk.jmh.infra.BenchmarkParams;
-import org.openjdk.jmh.profile.ExternalProfiler;
-import org.openjdk.jmh.results.AggregationPolicy;
-import org.openjdk.jmh.results.Aggregator;
-import org.openjdk.jmh.results.BenchmarkResult;
-import org.openjdk.jmh.results.Result;
-import org.openjdk.jmh.results.ResultRole;
-import org.openjdk.jmh.util.FileUtils;
 
 // Effectively equivalent to passing jvm args to append for each benchmark. e.g.,
 //
@@ -70,11 +70,11 @@ public class FlightRecordingProfiler implements ExternalProfiler {
 
         startFlightRecordingOptions += "filename=" + jfrData;
         String jfcPath = Paths.get(params.getJvm()).resolve("../../lib/jfr/profile.jfc").normalize().toAbsolutePath().toString();
-        flightRecorderOptions       += ",settings=" + jfcPath;
+        startFlightRecordingOptions += ",settings=" + jfcPath;
 
         return Arrays.asList(
                 "-XX:+FlightRecorder",
-                "-XX:StartFlightRecording="  + startFlightRecordingOptions,
+                "-XX:StartFlightRecording=" + startFlightRecordingOptions,
                 "-XX:FlightRecorderOptions=" + flightRecorderOptions);
     }
 
@@ -119,13 +119,13 @@ public class FlightRecordingProfiler implements ExternalProfiler {
         return false;
     }
 
-    
+
     public boolean checkSupport(List<String> msgs) {
         msgs.add("Commercial features of the JVM need to be enabled for this profiler.");
         return IS_SUPPORTED;
     }
 
-    
+
     public String label() {
         return "jfr";
     }
